@@ -8,8 +8,8 @@
 #include "status-pexp.h"
 #include <string>
 #include <iostream>
-using namespace std;
 
+using namespace std;
 namespace bdata = boost::unit_test::data;
 
 //
@@ -17,27 +17,27 @@ namespace bdata = boost::unit_test::data;
 //
 
 BOOST_DATA_TEST_CASE(
-	status_and, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_and, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ){
-	BOOST_TEST  ( [=] { task fail and anyStatus end }().failing() );
-	BOOST_TEST  ( [=] { task cont and anyStatus end }().running() );
-	BOOST_CHECK ( [=] { task done and anyStatus end }() == anyStatus );
+	BOOST_TEST  ( [=] task( fail and rh )().failing() );
+	BOOST_TEST  ( [=] task( cont and rh )().running() );
+	BOOST_CHECK ( [=] task( done and rh )() == rh );
 }
 
 BOOST_DATA_TEST_CASE(
-	status_or, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_or, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
-	BOOST_CHECK( [=] { task fail or anyStatus end }() == anyStatus );
-	BOOST_TEST ( [=] { task cont or anyStatus end }().running() );
-	BOOST_TEST ( [=] { task done or anyStatus end }().complete() );
+	BOOST_CHECK( [=] task( fail or rh )() == rh );
+	BOOST_TEST ( [=] task( cont or rh )().running() );
+	BOOST_TEST ( [=] task( done or rh )().complete() );
 }
 
 BOOST_DATA_TEST_CASE(
-	status_over, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_over, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
-	BOOST_CHECK( [=] { task fail over anyStatus end }() == anyStatus );
-	BOOST_TEST ( [=] { task cont over anyStatus end }().running()    );
-	BOOST_CHECK( [=] { task done over anyStatus end }() == anyStatus );
+	BOOST_CHECK( [=] task( fail over rh )() == rh );
+	BOOST_TEST ( [=] task( cont over rh )().running()    );
+	BOOST_CHECK( [=] task( done over rh )() == rh );
 }
 
 //
@@ -45,24 +45,13 @@ BOOST_DATA_TEST_CASE(
 //
 
 BOOST_AUTO_TEST_CASE(status_subexpression) {
-	BOOST_CHECK( [=] { 
-		task 
-			done
-			and fail
-			or done
-		end 
-	}() == done);
+	BOOST_CHECK( [=] task( done and fail or done )() == done);
 	//
-	BOOST_CHECK([=] { 
-		task
-			done
-		    and subtask(fail or done)
-		end 
-	}() == done);
+	BOOST_CHECK( [=] task( done and subtask(fail or done) )() == done);
 }
 
-status subexp   () { task done and subtask(fail or done) end }
-status no_subexp() { task done and fail or done end }
+status subexp()    task ( done and subtask(fail or done) );
+status no_subexp() task ( done and fail or done );
 
 BOOST_AUTO_TEST_CASE(subexp_perf_0) {
 	for (int i = 0; i < 1000000; i++) no_subexp();
@@ -77,27 +66,27 @@ BOOST_AUTO_TEST_CASE(subexp_perf_1) {
 //
 
 BOOST_DATA_TEST_CASE(
-	status_with, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_with, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
-	BOOST_TEST ( [=] { task fail with anyStatus end }().failing());
-	BOOST_CHECK( [=] { task cont with anyStatus end }() == anyStatus);
-	BOOST_TEST ( [=] { task done with anyStatus end }().complete());
+	BOOST_TEST ( [=] { task( fail with rh ) }().failing());
+	BOOST_CHECK( [=] { task( cont with rh ) }() == rh);
+	BOOST_TEST ( [=] { task( done with rh ) }().complete());
 }
 
 BOOST_DATA_TEST_CASE(
-	status_por, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_por, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
-	BOOST_CHECK( [=] { task fail por anyStatus end }() == anyStatus);
-	BOOST_CHECK( [=] { task cont por anyStatus end }() == anyStatus);
-	BOOST_TEST ( [=] { task done por anyStatus end }().complete());
+	BOOST_CHECK( [=] { task( fail por rh ) }() == rh);
+	BOOST_CHECK( [=] { task( cont por rh ) }() == rh);
+	BOOST_TEST ( [=] { task( done por rh ) }().complete());
 }
 
 BOOST_DATA_TEST_CASE(
-	status_pand, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, anyStatus
+	status_pand, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
-	BOOST_TEST ( [=] { task fail pand anyStatus end }().failing());
-	BOOST_CHECK( [=] { task cont pand anyStatus end }() == anyStatus);
-	BOOST_CHECK( [=] { task done pand anyStatus end }() == anyStatus);
+	BOOST_TEST ( [=] { task( fail pand rh ) }().failing());
+	BOOST_CHECK( [=] { task( cont pand rh ) }() == rh);
+	BOOST_CHECK( [=] { task( done pand rh ) }() == rh);
 }
 
 //

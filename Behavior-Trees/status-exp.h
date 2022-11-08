@@ -1,19 +1,18 @@
 #pragma once
 
-// Task preamble
-#define task { status s; (s =
+// GCC NOTE: use -fno-operator-names
 
-// Task epilogue
-#define end ).complete(); return s; }
+// Task
+#define task(EXP) { status s; (s = EXP).complete(); return s; }
 
 // Subtask
-#define subtask(x) [=] { task x end }()
+#define subtask(x) [=] task(x) ()
 
-// BT selector/fallback operation
+// Fallback operator; run RH if LH is failing
 #define or  ).pending() || (s =
 
-// BT sequence operation
+// Sequence operator; run RH if LH is done
 #define and ).impending() || (s = 
 
-// Work priority operator. Execute RH if LH is not running
+// Work priority operator; run RH if LH is not running
 #define over ).running() || (s =
