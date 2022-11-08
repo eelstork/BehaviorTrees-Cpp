@@ -10,15 +10,23 @@ bool status::complete() { return value == 1; }
 
 bool status::failing() { return value == -1; }
 
+bool status::immediate() { return value != 0; }
+
 bool status::running() { return value == 0; }
 
 bool status::pending() { return value != -1; }
 
 bool status::impending() { return value != +1; };
 
-status::operator bool() const { return value == 1; }
-
 status status::operator !() const { return status(-value); }
+
+bool status::operator ==(const status& y) {
+    return value == y.value;
+}
+
+bool status::operator !=(const status& y) {
+    return value != y.value;
+}
 
 std::ostream& operator<<(std::ostream& os, status const& s) {
 
@@ -34,9 +42,3 @@ std::ostream& operator<<(std::ostream& os, status const& s) {
     }
 
 }
-
-// --------------------------------------------------------------------
-
-bool is_status_pending(status arg) { return arg.pending(); }
-
-bool is_status_impending(status arg) { return arg.impending(); }

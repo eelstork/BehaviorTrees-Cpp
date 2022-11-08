@@ -152,7 +152,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="status-exp.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="status-pexp.h" />
     <ClInclude Include="status.h" />
   </ItemGroup>
   <ItemGroup>

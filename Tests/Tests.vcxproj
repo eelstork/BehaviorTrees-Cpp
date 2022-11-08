@@ -143,7 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Tests.cpp" />
+    <ClCompile Include="Status-Exp-Tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Behavior-Trees\Behavior-Trees.vcxproj">

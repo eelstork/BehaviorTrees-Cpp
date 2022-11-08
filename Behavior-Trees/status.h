@@ -10,13 +10,16 @@ struct status
 	status(int);
 
 	bool complete();
+	bool running();
 	bool failing();
 	bool impending();
+	bool immediate();
 	bool pending();
-	bool running();
 
-	explicit operator bool() const;
+	//explicit operator bool() const;
 	status operator !() const;
+	bool operator ==(const status& y);
+	bool operator !=(const status& y);
 
 };
 
@@ -32,5 +35,5 @@ static status done = status(1);
 
 // REMOVE???
 
-bool is_status_pending(status arg);
-bool is_status_impending(status arg);
+//bool is_status_pending(status arg);
+//bool is_status_impending(status arg);
