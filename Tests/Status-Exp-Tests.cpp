@@ -36,7 +36,7 @@ BOOST_DATA_TEST_CASE(
 	status_over, bdata::xrange(3) ^ bdata::make({ fail, cont, done }), xr, rh
 ) {
 	BOOST_CHECK( [=] task( fail over rh )() == rh );
-	BOOST_TEST ( [=] task( cont over rh )().running()    );
+	BOOST_TEST ( [=] task( cont over rh )().running() );
 	BOOST_CHECK( [=] task( done over rh )() == rh );
 }
 
