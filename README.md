@@ -34,11 +34,12 @@ class GrazerAI{
 Behavior trees simplify responsive, discrete control applications (such as with tick/update functions), including networking, video games, dynamic UIs,
 robotics and cognitive modeling. Tight integration enables performance with direct support for functional and object programming.
 
-Without adjustments (or complementary techniques), stateless behavior trees are not good at handling cosmetic tasks; this isn't specific to BT. If you think of BT as a *planning tool*, similar to GOAP, tasks 
-which do not cause motion (such as emoting) do not make sense.
+From an application development perspective, stateless control through behavior trees is a step forward; bools do not wait.
 
-While I find success with behavior trees, this library is only intended to get you started and encourage exploring behavior trees in a programmer 
-friendly environment.
+Without adjustments (or complementary techniques), stateless behavior trees are not good at handling cosmetic tasks; this is not specific to BT. 
+If you think of BT as a *planning tool*, similar to GOAP, tasks which do not cause motion (such as emoting) do not make sense.
+
+For context, read HERE [PENDING: REFERENCE]
 
 ## How it works
 
