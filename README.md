@@ -1,51 +1,44 @@
 # BehaviorTrees-Cpp
 
-A C++ implementation of [behavior trees]() via [Active Logic]()
-
-```
-#include "xactive_logic.h"  // active_logic.h if you do not need parallelism (common case) 
-using namespace activelogic;
-
-class GrazerAI{
-
-    // GCC note: use -fno-operator-names
-    status Step() task( 
-        Flee(ap.threat) or Attack(ap.threat) or Graze() 
-    );
-
-    status Attack(Agent* other) task( 
-        actor.Strike(other) or actor.Face(other)
-    );
-
-    // 'with' parallelizes tasks; see status_pexp.h
-    status Flee(Agent* other) task(
-        Evade(other, policies.safetyRange) with actor.Utter("Moo")  
-    );
-
-    status Graze() task(
-        feel.hungry and Consume(ap.grass) or Roam()
-    );
-
-}
-```
-
-## Benefits and limitations
+C++ [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)) via [active logic](https://arxiv.org/ftp/arxiv/papers/2011/2011.03835.pdf)
 
 Behavior trees simplify responsive, discrete control applications (such as with tick/update functions), including networking, video games, dynamic UIs,
-robotics and cognitive modeling. Tight integration enables performance with direct support for functional and object programming.
+robotics and cognitive modeling; tight integration enables performance with direct support for functional and object programming.
 
-From an application development perspective, stateless control through behavior trees is a step forward; bools do not wait.
+*Grazer.cpp*
+```cpp
+// GCC: compile with -fno-operator-names 
 
-Without adjustments (or complementary techniques), stateless behavior trees are not good at handling cosmetic tasks; this is not specific to BT. 
-If you think of BT as a *planning tool*, similar to GOAP, tasks which do not cause motion (such as emoting) do not make sense.
+#include "status-pexp.h"
+#include "Grazer.h"
 
-For context, read HERE [PENDING: REFERENCE]
+using namespace activelogic;
+
+// 'or' expresses BT selector/fallback 
+status Grazer::Step() task(
+    Flee(ap.threat) or Attack(ap.threat) or Graze()
+);
+
+status Grazer::Attack(void* other) task(
+    actor.Strike(other) or actor.Face(other)
+);
+
+// 'with' parallelizes subtasks
+status Grazer::Flee(void* other) task(
+    actor.Evade(other) with actor.Utter("Moo")
+);
+
+// 'and' expresses BT sequences 
+status Grazer::Graze() task(
+    feel.hungry and actor.Consume(ap.food) or actor.Roam()
+);
+```
 
 ## How it works
 
 [status](BehaviorTrees/status.h) is a three valued struct. A status may be *complete*, *running* or *failing*.
 
-The library defines 6 operators; three operators support sequential execution
+The library defines 6 operators; three operators support sequential execution:
 
 - the `and` operator is used to sequence subtasks; the second task (rh) executes if the first (lh) is complete
 - the `or` operator, aka 'selector' is used to prioritize subtasks; rh executes if lh is failing
@@ -57,40 +50,46 @@ Three operators support parallel execution:
 - with `pand` (parallel-and), rh executes if lh is not failing
 - the `with` operator is used to strictly parallelize; in this case, rh will only execute if lh is running
 
-Often parallism is not desirable; classic behavior trees mainly use sequences and selectors. When tasks are viewed as *activities*, `over` is useful
+Classic behavior trees mainly use sequences and selectors. When tasks are viewed as *activities*, `over` is useful
 because you need not differentiate the fail/complete status of underlying subtasks:
 
-```
-safety() over work() over rest()
+```cpp
+// Safety first! However when safety is not actionable, work proceeds; 
+// resting okay, be work either complete, or failing.
+status GoodJob() task( 
+    Safety() over Work() over Rest()
+);
 ```
 
-The above says that safety matters more than getting the work done, however if safety isn't actionable, work proceeds. Likewise resting is okay, be 
-work either complete, or failing.
+Parallelism is useful when approaching tasks from several angles or handling multimedia applications; coordinating multiple agents does not require special operators:
 
-Parallelism is useful both when approaching tasks from several angles, or the handling of multimedia applications; coordinating agents does not require special operators:
-
-```
-status Hunt(List agents, Agent* target){
-    foreach(Agent* hunter in agents){
-        if(hunter.Chase(target).Complete() return done;
+```cpp
+status Hunt(Agent hunters[], int count, Agent* target) {
+    for (int i = 0; i < count; i++) {
+        if (hunters[i].Chase(target).complete()) {
+            return done;
+        }
     }
+    return cont;
 }
 ```
+
+If you do not need parallel operation, only include `status-exp.h`.
 
 ## Usage notes
 
 a *task* is a functional block returning a status; the following is valid:
 
-```
-status Graze(){ 
-    Entity* g = ap.Find("Grass");
-    task( feel.hungry and Consume(g) or Roam() );
+```cpp
+status Graze() {
+    Agent* g = ap -> Find("Grass");
+    task(hungry and Consume(g) or Roam());
 );
 ```
 
 a *substask* is an expression returning status:
 
-```
+```cpp
 status Step() task( 
     Flee(ap.threat) 
     or subtask( actor.Strike(other) or actor.Face(other) ) 
