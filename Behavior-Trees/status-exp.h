@@ -1,4 +1,5 @@
 #pragma once
+#include "status.h"
 
 // GCC NOTE: use -fno-operator-names
 

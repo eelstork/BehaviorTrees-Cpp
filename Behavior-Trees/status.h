@@ -1,33 +1,38 @@
 #pragma once
 #include <iostream>
 
-struct status
-{
-	int value = 0;
+namespace activelogic {
+	struct status
+	{
+		int value = 0;
 
-	status();
+		status();
 
-	status(int);
+		status(int);
 
-	bool complete();
-	bool running();
-	bool failing();
-	bool impending();
-	bool immediate();
-	bool pending();
+		bool complete();
+		bool running();
+		bool failing();
+		bool impending();
+		bool immediate();
+		bool pending();
 
-	status operator !() const;
-	bool operator ==(const status& y);
-	bool operator !=(const status& y);
+		status operator !() const;
+		bool operator ==(const status& y);
+		bool operator !=(const status& y);
 
-};
+	};
 
-// Console output
+	// Status constants
 
-std::ostream& operator<<(std::ostream& os, status const& s);
+	static status fail = status(-1);
+	static status cont = status(0);
+	static status done = status(1);
 
-// Status constants
+	// Console output
 
-static status fail = status(-1);
-static status cont = status(0);
-static status done = status(1);
+	std::ostream& operator<<(std::ostream& os, status const& s);
+
+}
+
+

@@ -2,14 +2,14 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
-//
 #include "status.h"
 #include "status-exp.h"
 #include "status-pexp.h"
 #include <string>
 #include <iostream>
-
+//
 using namespace std;
+using namespace activelogic;
 namespace bdata = boost::unit_test::data;
 
 //
